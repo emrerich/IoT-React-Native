@@ -10,7 +10,7 @@ const CustomBezierChart = ({ data }) => {
           labels: data.labels,
           datasets: data.datasets,
         }}
-        width={Dimensions.get("window").width - 32}
+        width={Dimensions.get("window").width - 132}
         height={220}
         fromZero={true}
         yAxisSuffix=" cal"
@@ -26,7 +26,7 @@ const CustomBezierChart = ({ data }) => {
             borderRadius: 16,
           },
           propsForDots: {
-            r: "7",
+            r: "3",
             strokeWidth: "2 ",
             stroke: "#1B4242",
           },

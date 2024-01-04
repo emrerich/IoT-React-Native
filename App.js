@@ -13,6 +13,7 @@ import Admin from "./pages/Admin";
 import AllMoves from "./pages/AllMoves";
 import SelectMove from "./pages/SelectMove";
 import MoveDetailPage from "./pages/movesPage/MoveDetailPage";
+import Customers from "./pages/Customers";
 
 const firebaseApp = initializeApp(firebaseConfig);
 
@@ -30,6 +31,7 @@ export default function App() {
           <Stack.Screen name="AllMoves" component={AllMoves} />
           <Stack.Screen name="SelectMove" component={SelectMove} />
           <Stack.Screen name="MoveDetailPage" component={MoveDetailPage} />
+          <Stack.Screen name="Customers" component={Customers} />
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar style="auto" />

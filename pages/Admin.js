@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
 import { getAuth, signOut } from "firebase/auth";
 
-import { getFirestore, doc, setDoc, collection } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+} from "firebase/firestore";
 import CustomButton from "../components/Button-Custom";
 import { useNavigation } from "@react-navigation/native";
 import CustomBezierChart from "../components/charts/Custom-Bezier-Chart";
@@ -12,21 +18,13 @@ const Admin = () => {
   const [move, setMove] = useState("");
   const [calorie, setCalorie] = useState(0);
   const [gap, setGap] = useState(0);
-  const auth = getAuth();
-  const bigData = {
+  const [users, setUsers] = useState([]);
+  const [bigData, setBigData] = useState({
     bezierData: {
-      labels: ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"],
+      labels: ["Şınav", "Mekik", "Curl"],
       datasets: [
         {
-          data: [
-            Math.random() * 10000,
-            Math.random() * 10000,
-            Math.random() * 10000,
-            Math.random() * 10000,
-            Math.random() * 10000,
-            Math.random() * 10000,
-            Math.random() * 10000,
-          ],
+          data: [],
         },
       ],
     },
@@ -34,12 +32,93 @@ const Admin = () => {
       labels: ["Şınav", "Mekik", "Curl"],
       datasets: [
         {
-          data: [2500, 4500, 2800],
+          data: [],
         },
       ],
       header: "Bu Haftaki Kullanıcıların Aktiviteleri",
     },
-  };
+  });
+  const auth = getAuth();
+
+  // useEffect ile kullanıcıları getir
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const db = getFirestore();
+        const usersCollection = collection(db, "users");
+        const usersSnapshot = await getDocs(usersCollection);
+        const usersData = usersSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setUsers(usersData);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchMovesData = async () => {
+      try {
+        const db = getFirestore();
+        const movesCollection = collection(db, "Moves");
+        const movesSnapshot = await getDocs(movesCollection);
+
+        const movesData = movesSnapshot.docs.map((doc) => {
+          const moveData = doc.data();
+          return 3 * moveData.counter; // Her biri için counter ile çarp
+        });
+
+        const updatedBigData = {
+          bezierData: {
+            ...bigData.bezierData,
+            datasets: [{ data: movesData }],
+          },
+          barData: {
+            ...bigData.barData,
+            datasets: [{ data: movesData }], // Update this array with the correct values
+          },
+        };
+
+        setBigData(updatedBigData);
+      } catch (error) {
+        console.error("Error fetching moves data:", error);
+      }
+    };
+
+    fetchMovesData();
+  }, []);
+  useEffect(() => {
+    const fetchMovesData = async () => {
+      try {
+        const db = getFirestore();
+        const movesCollection = collection(db, "Moves");
+        const movesSnapshot = await getDocs(movesCollection);
+
+        const movesData = movesSnapshot.docs.map((doc) => {
+          const moveData = doc.data();
+          return 3 * moveData.counter; // Her biri için counter ile çarp
+        });
+
+        const updatedBezierData = {
+          ...bigData.bezierData,
+          datasets: [{ data: movesData }],
+        };
+
+        setBigData((prevBigData) => ({
+          ...prevBigData,
+          bezierData: updatedBezierData,
+        }));
+      } catch (error) {
+        console.error("Error fetching moves data:", error);
+      }
+    };
+
+    fetchMovesData();
+  }, [bigData.bezierData]);
   const handleSignOut = () => {
     signOut(auth).then(() => {
       navigation.navigate("Login");
@@ -50,7 +129,7 @@ const Admin = () => {
   };
   const navigation = useNavigation();
   const handleCustomers = () => {
-    navigation.navigate("Profile");
+    navigation.navigate("Customers", { users }); // Customers sayfasına kullanıcıları props olarak gönder
   };
   const handleAddMove = async () => {
     try {
@@ -108,8 +187,8 @@ const Admin = () => {
         onChangeText={setGap}
       />
       <CustomButton title="Ekle" onPress={handleAddMove} />
-      <CustomBezierChart data={bigData.bezierData} />
-      <CustomBarChart data={bigData.barData} />
+      {/* <CustomBezierChart data={bigData.bezierData} />
+      <CustomBarChart data={bigData.barData} /> */}
 
       <CustomButton title="Kullanıcıları gör" onPress={handleCustomers} />
       <CustomButton title="Tüm Hareketleri Gör" onPress={handleAllMoves} />

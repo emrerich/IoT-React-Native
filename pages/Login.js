@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   registerText: {
-    color: "#1B4242",
+    color: "blue",
     fontWeight: "bold",
     textDecorationLine: "none",
     marginTop: 10,
